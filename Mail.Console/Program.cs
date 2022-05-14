@@ -12,21 +12,26 @@ namespace Mail
         {
             using var host = CreateHostBuilder(args).Build();
 
-            var mailService = host.Services.GetRequiredService<IMailService>();
-
-            Console.WriteLine("Sending email..");
-
-            mailService.SendTestMail();
-
-            Console.WriteLine("Email sent!");
+            SendTestMail(host.Services);
 
             Console.ReadKey();
+        }
+
+        private static void SendTestMail(IServiceProvider services)
+        {
+            Console.WriteLine("Sending email..");
+
+            var mailService = services.GetRequiredService<IMailService>();
+
+            mailService.SendTestMailAsync().Wait();
+
+            Console.WriteLine("Email sent!");
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureServices((_, services) =>
+                .ConfigureServices((hostContext, services) =>
                     services.AddTransient<IMailService, MailService>());
         }
     }
